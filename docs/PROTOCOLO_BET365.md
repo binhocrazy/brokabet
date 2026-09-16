@@ -181,7 +181,11 @@ Brokabet como aviso.
 
 ## O que ainda falta
 
-1. **`X-Net-Sync-Term`** — como o JS gera. Sem isso nada acima funciona fora do navegador.
+1. **`X-Net-Sync-Term`** — como o JS gera. Estratégia da Fase 1: **não gerar,
+   colher** — `src/executor/netSync.js` gruda na aba do slot via CDP e captura
+   os tokens que a própria página emite (header dos fetch/XHR e `A_<token>` dos
+   frames zap). Validar com `node scripts/poc/netsync.js`. Se a Bet365 amarrar
+   o token ao request de origem, resta invocar o gerador no contexto da página.
 2. Cookies exatos enviados (a captura pegou só os headers do JS; precisa de
    `Network.requestWillBeSentExtraInfo` pra ver o `Cookie`).
 3. Tabela de `sr` (códigos de erro do placebet) e `mt`/`MI` (tipos de mercado).

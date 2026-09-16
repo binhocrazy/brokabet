@@ -2,20 +2,28 @@
 // Adaptador BET365 direto — o objetivo final. Reproduz o protocolo capturado na
 // Fase 0 (docs/PROTOCOLO_BET365.md): addbet → placebet, tratando sr=14 (odd mudou).
 //
-// BLOQUEADO até termos o gerador de `X-Net-Sync-Term`. Sem esse header a Bet365
-// devolve resultCode=fail no login e recusa o placebet. netSyncTerm() está isolado
-// de propósito: quando a engenharia reversa terminar, é o único ponto a preencher.
+// O gargalo era o `X-Net-Sync-Term`. Sem esse header a Bet365 devolve
+// resultCode=fail no login e recusa o placebet. netSyncTerm() fica isolado de
+// propósito: é o ponto único de troca se a estratégia de colheita mudar.
+//
+// O X-Net-Sync-Term vem de COLHEITA na aba do slot (src/executor/netSync.js):
+// hook via CDP captura os tokens que o JS da própria página gera. Se a Bet365
+// amarrar o token ao request de origem, a saída é invocar o gerador no
+// contexto da página — o hook grava a fonte do token pra esse diagnóstico.
 //
 // A sessão do slot (pstk, cookies) fica em slots.session_json, criada por um login
-// que também depende do mesmo header. Enquanto isso, este adaptador lança um erro
-// claro em vez de fingir que apostou.
+// que também depende do mesmo header. Enquanto o fluxo não é completado, este
+// adaptador lança um erro claro em vez de fingir que apostou.
+
+const netSync = require("../netSync");
 
 const NET_SYNC_READY = process.env.BET365_NETSYNC_READY === "1";
 
-function netSyncTerm(/* context */) {
-  // TODO(fase-1): reimplementar o gerador do X-Net-Sync-Term.
-  // Entrada provável: sessão + contador + fingerprint; saída: blob base64 "A0gABAC…".
-  throw new Error("X-Net-Sync-Term ainda não implementado — ver docs/PROTOCOLO_BET365.md");
+// Fase 1: token fresco colhido da aba do slot (fetch/xhr da página ou A_<token>
+// dos frames zap — mesmo gerador). Erros NETSYNC_MISSING/NETSYNC_STALE dizem se
+// a aba está deslogada/parada. node scripts/poc/netsync.js valida no PC.
+async function netSyncTerm(slot) {
+  return netSync.harvest(slot);
 }
 
 module.exports = {
@@ -34,8 +42,8 @@ module.exports = {
     //   4. se sr=14 (selections_changed): reler od, checar min-odd/range, reenviar com bg/cc/sa novos e aa=0
     //   5. sucesso → br (código), ms (bet delay)
     throw new Error("placeBet bet365 não implementado");
-    // eslint-disable-next-line no-unused-vars
-    netSyncTerm();
+    // eslint-disable-next-line no-unused-vars, no-unreachable
+    await netSyncTerm(slot);
   },
   async settle() { return null; }, // via WebSocket pshudws (SETTLEDBETS) — Fase 2
 };
