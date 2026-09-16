@@ -75,7 +75,7 @@ router.post("/slots", async (req, res) => {
 });
 router.post("/slots/:id", async (req, res) => {
   const slot = await db.slots.byId(req.params.id);
-  if (!slot || slot.user_id !== Number(req.user.id)) return res.status(404).end();
+  if (!slot || Number(slot.user_id) !== Number(req.user.id)) return res.status(404).end();
   const b = req.body;
   const patch = {};
   for (const k of ["name", "bookie", "executor", "jbot_key", "bet_user"]) if (b[k] != null) patch[k] = b[k];
@@ -88,13 +88,13 @@ router.post("/slots/:id", async (req, res) => {
 });
 router.post("/slots/:id/toggle", async (req, res) => {
   const slot = await db.slots.byId(req.params.id);
-  if (!slot || slot.user_id !== Number(req.user.id)) return res.status(404).end();
+  if (!slot || Number(slot.user_id) !== Number(req.user.id)) return res.status(404).end();
   await db.slots.update(slot.id, { paused: !slot.paused });
   res.redirect("/slots");
 });
 router.post("/slots/:id/delete", async (req, res) => {
   const slot = await db.slots.byId(req.params.id);
-  if (!slot || slot.user_id !== Number(req.user.id)) return res.status(404).end();
+  if (!slot || Number(slot.user_id) !== Number(req.user.id)) return res.status(404).end();
   await db.slots.remove(slot.id);
   res.redirect("/slots");
 });

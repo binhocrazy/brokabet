@@ -6,6 +6,7 @@
 
 const reader = require("../../reader");
 const { computeLineParams, lineWithin } = require("../lineParams");
+const { buildAddbet, buildPlacebet } = require("../bet365Protocol");
 
 module.exports = {
   name: "shadow",
@@ -43,6 +44,27 @@ module.exports = {
 
     // decisão que o executor real tomaria
     const would = current && within ? "placed" : "rejected";
+
+    // monta o cupom REAL que seria enviado à Bet365 (addbet → placebet), pra a
+    // simulação mostrar exatamente os bytes. Só não dispara (falta X-Net-Sync-Term).
+    let betslip = null;
+    if (current) {
+      const common = {
+        fixtureId: tip.fixture_id, oddId: tip.odd_id, sportId: tip.sport_id,
+        fractionOdd: current.fraction_odd, decimalOdd: oddDecimal, marketType: null,
+      };
+      const addbet = buildAddbet(common);
+      const placebet = buildPlacebet({ ...common, sa: "<sa vem da resposta do addbet>", stake });
+      betslip = {
+        addbet_url: "POST https://www.bet365.bet.br/BetsWebAPI/addbet",
+        addbet_body: addbet.body,
+        placebet_url: "POST https://www.bet365.bet.br/BetsWebAPI/placebet?betGuid=<bg>&c=<cc>&p=<pc>",
+        placebet_body: placebet.body,
+        expected_return: placebet.expectedReturn,
+        blocked_by: "X-Net-Sync-Term (Fase 1) — sem esse header a Bet365 recusa",
+      };
+    }
+
     return {
       status: "shadow",
       would,
@@ -52,8 +74,8 @@ module.exports = {
       starting_line: tip.line,
       ending_line: currentLine != null ? String(currentLine) : null,
       latency_ms: Date.now() - started,
-      note: note || (within ? "linha dentro do range" : "linha fora do range → rejeitaria"),
-      request: { line_params: line, current_odd: current?.fraction_odd, current_line: currentLine },
+      note: note || (within ? "linha dentro do range → apostaria" : "linha fora do range → rejeitaria"),
+      request: { line_params: line, current_odd: current?.fraction_odd, current_line: currentLine, betslip },
     };
   },
 
