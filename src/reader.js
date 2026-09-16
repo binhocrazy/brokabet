@@ -25,8 +25,10 @@ const reader = {
 
   // Localiza uma seleção pelo odd_id dentro do detalhe do jogo. Devolve
   // { market, outcome } com a odd/linha ATUAL, ou null se sumiu (suspensa/puxada).
-  async findByOddId(fixtureId, oddId, bookie = "B365") {
-    const det = await reader.detail(fixtureId, bookie);
+  // gameId é o id do TOPO da lista (com que o detalhe é indexado) — no protocolo,
+  // o event_id. NÃO é o fixture_id da seleção (esse vai pro Bet365 como `f`).
+  async findByOddId(gameId, oddId, bookie = "B365") {
+    const det = await reader.detail(gameId, bookie);
     for (const m of det.markets || []) {
       for (const o of m.outcomes || []) {
         if (String(o.odd_id) === String(oddId)) return { detail: det, market: m, outcome: o };

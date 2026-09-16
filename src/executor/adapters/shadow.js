@@ -13,16 +13,23 @@ module.exports = {
   async placeBet(slot, tip, params) {
     const started = Date.now();
     let current = null, note = "";
+    // resolve pelo game_id (event_id); se a tip não trouxe, cai no fixture_id
+    const gameId = tip.event_id || tip.fixture_id;
     try {
-      const found = await reader.findByOddId(tip.fixture_id, tip.odd_id, tip.bookie);
+      const found = await reader.findByOddId(gameId, tip.odd_id, tip.bookie);
       current = found.outcome;
       if (!current) note = "seleção não encontrada no leitor (suspensa/puxada)";
     } catch (e) {
       note = `leitor indisponível: ${e.message}`;
     }
 
+    // lado da seleção: do nome do outcome atual, senão da descrição
+    const desc = String(tip.description || "").toLowerCase();
+    const oname = String(current?.name || "").toLowerCase();
+    const side = oname.includes("under") || desc.includes("under") ? "under"
+      : oname.includes("over") || desc.includes("over") ? "over" : desc;
     const line = computeLineParams({
-      selection: String(tip.description || "").toLowerCase().includes("under") ? "under" : "over",
+      selection: side,
       line: tip.line,
       toleranceUp: params.toleranceUp ?? params.tolerance ?? 0.5,
       toleranceDown: params.toleranceDown ?? params.tolerance ?? 0.5,
