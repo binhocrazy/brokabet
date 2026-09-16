@@ -1,0 +1,31 @@
+<%- include('_shell_open') %>
+<h1>Apostas</h1><p class="sub">Tips recebidas e como cada slot as executou.</p>
+<div class="panel">
+  <% if (!tips.length) { %><p class="mut">Nenhuma tip ainda. Envie via <span class="mono">POST /api/placebet/b365/tips</span> ou aguarde o Brokalab.</p><% } else { %>
+  <% for (const item of tips) { const t = item.tip %>
+    <div style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div><strong><%= t.description || '(sem descrição)' %></strong>
+          <div class="mut" style="font-size:12px"><%= t.bookie %> · fixture <%= t.fixture_id %> · odd_id <%= t.odd_id %> · linha <%= t.line ?? '—' %> · <%= new Date(t.created_at).toLocaleString('pt-BR') %></div>
+        </div>
+        <span class="pill"><%= t.source %></span>
+      </div>
+      <% if (item.slots.length) { %>
+      <table style="margin-top:10px"><thead><tr><th>Slot</th><th>Status</th><th>Stake</th><th>Odd</th><th>Linha</th><th>Retorno</th><th>Resultado</th></tr></thead><tbody>
+      <% for (const s of item.slots) { const rl = RESULT[s.tip_result]||RESULT[0] %>
+        <tr><td><%= s.slot_name %></td><td><span class="tag <%= s.status %>"><%= s.status %></span></td>
+        <td>R$ <%= s.stake ?? '—' %></td><td><%= s.odds ?? '—' %></td><td><%= s.ending_line ?? s.starting_line ?? '—' %></td>
+        <td>R$ <%= s.total_returns ?? '—' %></td><td><span class="tag <%= rl.c %>"><%= rl.t %></span></td></tr>
+      <% } %>
+      </tbody></table>
+      <% } else { %><p class="mut" style="margin:8px 0 0;font-size:12px">sem execução registrada</p><% } %>
+    </div>
+  <% } %>
+  <% if (pages > 1) { %>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <% for (let p=1;p<=pages;p++){ %><a class="btn <%= p===pageNum?'':'ghost' %> sm" href="/tips?page=<%= p %>"><%= p %></a><% } %>
+    </div>
+  <% } %>
+  <% } %>
+</div>
+<%- include('_shell_close') %>

@@ -1,0 +1,21 @@
+<%- include('_head') %>
+<div class="wrap">
+  <aside class="side">
+    <div class="brand">◈ BROKABET</div>
+    <nav class="nav">
+      <a href="/" class="<%= page==='home'?'active':'' %>">Início</a>
+      <a href="/slots" class="<%= page==='slots'?'active':'' %>">Meus Slots</a>
+      <a href="/tips" class="<%= page==='tips'?'active':'' %>">Apostas</a>
+      <a href="/events" class="<%= page==='events'?'active':'' %>">Eventos</a>
+      <a href="/account" class="<%= page==='account'?'active':'' %>">Conta &amp; API</a>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="top">
+      <div class="mut">Automação de apostas própria</div>
+      <div class="r">
+        <span class="pill"><%= user.email %></span>
+        <form method="post" action="/logout" style="margin:0"><button class="btn ghost sm">Sair</button></form>
+      </div>
+    </div>
+    <div class="content">

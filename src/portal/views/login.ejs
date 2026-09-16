@@ -1,0 +1,14 @@
+<%- include('_head', { title: 'Login' }) %>
+<div class="center">
+  <form class="loginbox" method="post" action="/login">
+    <div class="brand" style="text-align:center;padding-bottom:20px">◈ BROKABET</div>
+    <% if (error) { %><div class="err"><%= error %></div><% } %>
+    <label>E-mail</label>
+    <input name="email" type="email" required autofocus style="margin-bottom:14px">
+    <label>Senha</label>
+    <input name="password" type="password" required style="margin-bottom:20px">
+    <button class="btn" style="width:100%">Entrar</button>
+    <p class="mut" style="text-align:center;font-size:12px;margin-top:16px">Automação de apostas — uso interno</p>
+  </form>
+</div>
+</body></html>

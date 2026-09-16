@@ -1,0 +1,12 @@
+<%- include('_shell_open') %>
+<h1>Eventos</h1><p class="sub">Log do executor, liquidação e slots.</p>
+<div class="panel">
+  <table><thead><tr><th>Quando</th><th>Nível</th><th>Slot</th><th>Mensagem</th></tr></thead><tbody>
+  <% for (const e of events) { %>
+    <tr><td class="mut mono" style="white-space:nowrap"><%= new Date(e.created_at).toLocaleString('pt-BR') %></td>
+    <td><span class="tag <%= e.level==='error'?'red':e.level==='warn'?'void':'pending' %>"><%= e.level %></span></td>
+    <td class="mut"><%= e.slot_name || '—' %></td><td><%= e.message %></td></tr>
+  <% } %>
+  </tbody></table>
+</div>
+<%- include('_shell_close') %>

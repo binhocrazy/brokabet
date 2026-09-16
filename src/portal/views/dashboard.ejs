@@ -1,0 +1,41 @@
+<%- include('_shell_open') %>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+  <div><h1>Olá, <%= user.name || user.email %></h1><p class="sub">Resumo das suas operações.</p></div>
+  <form method="get" style="display:flex;gap:8px;align-items:center">
+    <span class="mut">Período:</span>
+    <select name="period" onchange="this.form.submit()">
+      <% for (const p of [['today','Hoje'],['7d','7 dias'],['30d','30 dias'],['all','Tudo']]) { %>
+        <option value="<%= p[0] %>" <%= period===p[0]?'selected':'' %>><%= p[1] %></option>
+      <% } %>
+    </select>
+  </form>
+</div>
+
+<div class="grid cards" style="margin-top:8px">
+  <div class="card"><div class="lbl">Quantidade de slots</div><div class="val"><%= slots.length %></div></div>
+  <div class="card"><div class="lbl">Saldo total</div><div class="val">R$ <%= saldoTotal.toFixed(2) %></div></div>
+  <div class="card"><div class="lbl">Investido</div><div class="val">R$ <%= (stats.invested||0).toFixed(2) %></div></div>
+  <div class="card"><div class="lbl">Em aberto</div><div class="val">R$ <%= (stats.open_stake||0).toFixed(2) %></div></div>
+</div>
+
+<div class="grid kpis" style="margin-top:16px">
+  <div class="card"><div class="lbl">Total Tips</div><div class="val"><%= stats.total %></div></div>
+  <div class="card"><div class="lbl">Conversão</div><div class="val"><%= conv.toFixed(1) %>%</div></div>
+  <div class="card"><div class="lbl">Greens</div><div class="val" style="color:var(--green)"><%= stats.greens %></div></div>
+  <div class="card"><div class="lbl">Reds</div><div class="val" style="color:var(--red)"><%= stats.reds %></div></div>
+  <div class="card"><div class="lbl">Void</div><div class="val" style="color:var(--void)"><%= stats.voids %></div></div>
+  <div class="card"><div class="lbl">Lucro/Prejuízo</div><div class="val" style="color:<%= stats.profit>=0?'var(--green)':'var(--red)' %>">R$ <%= (stats.profit||0).toFixed(2) %></div></div>
+  <div class="card"><div class="lbl">ROI</div><div class="val"><%= roi.toFixed(1) %>%</div></div>
+</div>
+
+<div class="panel">
+  <h2>Últimas apostas finalizadas</h2>
+  <% if (!latest.length) { %><p class="mut">Nenhuma aposta finalizada ainda.</p><% } else { %>
+  <table><thead><tr><th>Descrição</th><th>Slot</th><th>Stake</th><th>Odd</th><th>Retorno</th><th>Resultado</th></tr></thead><tbody>
+  <% for (const r of latest) { const rl = RESULT[r.tip_result]||RESULT[0] %>
+    <tr><td><%= r.description || '—' %></td><td class="mut"><%= r.slot_name %></td><td>R$ <%= (r.stake||0) %></td><td><%= r.odds||'—' %></td>
+    <td>R$ <%= (r.total_returns||0) %></td><td><span class="tag <%= rl.c %>"><%= rl.t %></span></td></tr>
+  <% } %>
+  </tbody></table><% } %>
+</div>
+<%- include('_shell_close') %>

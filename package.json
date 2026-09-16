@@ -1,0 +1,25 @@
+{
+  "name": "brokabet",
+  "version": "0.1.0",
+  "description": "Executor próprio de apostas — portal + API compatível com o JBot, rodando no PC",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "poc:captura": "node scripts/poc/captura-aposta.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "pg": "^8.23.0"
+  }
+}

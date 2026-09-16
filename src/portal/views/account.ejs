@@ -1,0 +1,12 @@
+<%- include('_shell_open') %>
+<h1>Conta &amp; API</h1><p class="sub">A chave abaixo é o <span class="mono">client_key</span> que o Brokalab manda no header <span class="mono">Authorization</span>.</p>
+<div class="panel">
+  <% if (rotated) { %><div class="err" style="background:rgba(31,191,117,.12);color:var(--green)">Chave rotacionada. Atualize o Brokalab.</div><% } %>
+  <label>API key (client_key)</label>
+  <input class="mono" value="<%= apiKey %>" readonly onclick="this.select()">
+  <p class="mut" style="font-size:12px;margin-top:10px">Aponte o Brokalab: <span class="mono">BROKABET_BASE=http://SEU_IP:8367</span> e use esta chave como client_key do slot JBot.</p>
+  <form method="post" action="/account/rotate-key" style="margin-top:14px" onsubmit="return confirm('Rotacionar? O Brokalab precisará da chave nova.')">
+    <button class="btn danger">Rotacionar chave</button>
+  </form>
+</div>
+<%- include('_shell_close') %>
